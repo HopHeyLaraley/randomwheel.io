@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Колесо рандомизации</title>
+    <title>Колеса рандомизации с участниками</title>
     <style>
         * {
             margin: 0;
@@ -12,83 +12,107 @@
         }
 
         body {
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        .container {
-            width: 500px;
-            height: 500px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        .result-container {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
+        .header {
             text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Панель участников */
+        .participants-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .participants-panel h2 {
+            color: #667eea;
             margin-bottom: 20px;
-            position: relative;
-            height: 70px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .participant-result {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px dashed #667eea;
+            text-align: center;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        #resultText {
-            font-size: 1.1rem;
+        #participantResultText {
+            font-size: 1.6rem;
             font-weight: 600;
+            color: #333;
             transition: all 0.3s ease;
-            max-width: 100%;
-            padding: 0 10px;
-            text-align: center;
-            line-height: 1.4;
         }
 
-        .arrow {
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            color: #667eea;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-        }
-
-        .wheel-container {
-            width: 400px;
-            height: 400px;
-            margin-bottom: 20px;
+        .participant-wheel-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 25px;
             cursor: pointer;
             position: relative;
         }
 
-        #wheelCanvas {
+        #participantWheelCanvas {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease;
         }
 
-        .wheel-container:hover #wheelCanvas {
-            transform: scale(1.02);
+        .participant-wheel-container:hover #participantWheelCanvas {
+            transform: scale(1.05);
         }
 
-        .spin-btn {
+        .participant-controls {
+            margin-top: 20px;
+        }
+
+        .participant-options textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .participant-options textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .participant-btn {
             background: linear-gradient(135deg, #FF5722, #E64A19);
             color: white;
             border: none;
@@ -99,35 +123,148 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
+            width: 100%;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
         }
 
-        .spin-btn:hover {
+        .participant-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.4);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
         }
 
-        .spin-btn:active {
-            transform: translateY(0);
+        /* Панель 4-х колес */
+        .wheels-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .spin-btn svg {
-            animation: spin 2s linear infinite;
-            animation-play-state: paused;
+        .wheels-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
         }
 
-        .spin-btn.spinning svg {
-            animation-play-state: running;
+        .combined-result {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px dashed #667eea;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        #combinedResultText {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .wheels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .wheel-item {
+            text-align: center;
+        }
+
+        .wheel-item h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wheel-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .wheel-container:hover .wheel-canvas {
+            transform: scale(1.05);
+        }
+
+        /* История результатов */
+        .results-history {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-history h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        #historyList {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        #historyList li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Скрытые элементы */
+        .hidden-options {
+            display: none;
+        }
+
+        /* Анимации */
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        /* Анимация для результата */
         @keyframes resultPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -138,38 +275,114 @@
             animation: resultPulse 0.5s ease;
         }
 
-        /* Адаптивность для iframe */
-        @media (max-width: 520px) {
-            .container {
-                width: 95vw;
-                height: 95vw;
-                max-width: 500px;
-                max-height: 500px;
-                padding: 10px;
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .participants-panel {
+                order: 2;
+            }
+            
+            .wheels-panel {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .wheels-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .participant-wheel-container {
+                width: 250px;
+                height: 250px;
             }
             
             .wheel-container {
-                width: 85vw;
-                height: 85vw;
-                max-width: 400px;
-                max-height: 400px;
+                width: 180px;
+                height: 180px;
             }
             
-            .result-container {
-                padding: 10px;
-                height: auto;
-                min-height: 60px;
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wheel-container {
+                width: 160px;
+                height: 160px;
             }
             
-            #resultText {
-                font-size: 1rem;
+            .participant-wheel-container {
+                width: 220px;
+                height: 220px;
+            }
+            
+            #participantResultText, #combinedResultText {
+                font-size: 1.3rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Скрытое поле с вариантами (заполняется в коде) -->
-    <textarea id="hiddenOptions" style="display:none;">
+    <div class="header">
+        <h1>🎡 Система рандомизации с участниками</h1>
+        <p>Кликните на любое колесо, чтобы запустить вращение</p>
+    </div>
+
+    <div class="main-container">
+        <!-- Левая панель: Колесо участников -->
+        <div class="participants-panel">
+            <h2>🎯 Колесо участников</h2>
+            
+            <div class="participant-result">
+                <div id="participantResultText">Выберите участника</div>
+            </div>
+            
+            <div class="participant-wheel-container" id="participantWheelContainer">
+                <canvas id="participantWheelCanvas" width="300" height="300"></canvas>
+            </div>
+            
+            <div class="participant-controls">
+                <div class="participant-options">
+                    <textarea id="participantOptions" placeholder="Введите имена участников (каждый с новой строки)">
+Иван Иванов
+Мария Петрова
+Алексей Сидоров
+Елена Козлова
+Дмитрий Николаев
+Ольга Морозова
+Сергей Васильев
+Анна Павлова</textarea>
+                </div>
+                <button class="participant-btn" id="updateParticipantsBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    Обновить колесо участников
+                </button>
+            </div>
+        </div>
+
+        <!-- Правая панель: 4 тематических колеса -->
+        <div class="wheels-panel">
+            <h2>🎲 Тематические колеса (2×2)</h2>
+            
+            <div class="combined-result">
+                <div id="combinedResultText">Результат появится здесь</div>
+            </div>
+            
+            <div class="wheels-grid">
+                <!-- Скрытые поля с вариантами -->
+                <div class="hidden-options">
+                    <textarea id="options1">
 Как вы отдыхаете от работы и переключаетесь
 Интересная книга или статья за последнее время
 Необычное место которое вы посетили
@@ -179,379 +392,723 @@
 Навык которым хотите овладеть в следующем году
 Как изменилась ваша роль за последнее время
 Самый полезный совет который вы получали
-Где и как вы находите новые идеи
-Что такое хорошая корпоративная культура
-Пример отличного сервиса который вам запомнился
-Что помогает поддерживать баланс между работой и жизнью
-Какой ваш любимый инструмент для продуктивности и почему
-Как вы справляетесь с прокрастинацией или выгоранием
-Что вы цените в работе с коллегами больше всего
-История успеха которой вы гордитесь в последнее время
-Что бы вы изменили в нашем рабочем процессе если бы могли
-Как вы принимаете важные решения
-Какая технология удивила вас в последнее время
-Полезная привычка которую вы выработали
-Что такое для вас эффективная коммуникация
-Как вы представляете идеальную рабочую неделю
-    </textarea>
-    
-    <div class="container">
-        <!-- Результат сверху -->
-        <div class="result-container">
-            <div id="resultText">Готово к запуску</div>
-            <div class="arrow">▼</div>
+Где и как вы находите новые идеи</textarea>
+                    <textarea id="options2">
+Работа и карьера
+Личное развитие
+Отдых и хобби
+Технологии и инновации
+Общение и отношения
+Планы и цели
+Здоровье и спорт
+Финансы и инвестиции
+Путешествия и культура
+Творчество и искусство</textarea>
+                    <textarea id="options3">
+Расскажи историю
+Поделись опытом
+Дай совет
+Опиши пример
+Представь идею
+Задай встречный вопрос
+Сравни два подхода
+Объясни простыми словами
+Покажи на практике
+Предложи решение</textarea>
+                    <textarea id="options4">
+Кратко (1-2 минуты)
+Подробно (3-5 минут)
+С примерами из жизни
+С юмором и шутками
+Серьезно и вдумчиво
+Творчески и нестандартно
+С визуальной поддержкой
+Интерактивно с аудиторией
+С личной историей
+С практическими советами</textarea>
+                </div>
+                
+                <!-- Колесо 1 -->
+                <div class="wheel-item">
+                    <h3>🎯 Вопросы для обсуждения</h3>
+                    <div class="wheel-container" data-wheel="1">
+                        <canvas class="wheel-canvas" width="200" height="200" data-wheel="1"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Колесо 2 -->
+                <div class="wheel-item">
+                    <h3>✨ Тематика выступления</h3>
+                    <div class="wheel-container" data-wheel="2">
+                        <canvas class="wheel-canvas" width="200" height="200" data-wheel="2"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Колесо 3 -->
+                <div class="wheel-item">
+                    <h3>🚀 Формат ответа</h3>
+                    <div class="wheel-container" data-wheel="3">
+                        <canvas class="wheel-canvas" width="200" height="200" data-wheel="3"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Колесо 4 -->
+                <div class="wheel-item">
+                    <h3>🎭 Стиль презентации</h3>
+                    <div class="wheel-container" data-wheel="4">
+                        <canvas class="wheel-canvas" width="200" height="200" data-wheel="4"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Колесо по центру -->
-        <div class="wheel-container">
-            <canvas id="wheelCanvas" width="400" height="400"></canvas>
-        </div>
-        
-        <!-- Кнопка запуска -->
-        <button style="display: none;" id="spinBtn" class="spin-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 2v6h-6"></path>
-                <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
-                <path d="M3 22v-6h6"></path>
-                <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
-            </svg>
-            Крутить колесо
-        </button>
-        
-        <!-- Скрытый контрол для обновления при изменении вариантов -->
-        <button id="updateBtn" style="display:none;">Обновить</button>
+    </div>
+
+    <!-- История результатов -->
+    <div class="results-history">
+        <h3>📜 История результатов:</h3>
+        <ul id="historyList">
+            <!-- История будет добавляться динамически -->
+        </ul>
     </div>
 
     <script>
-        class SimpleWheel {
-    constructor() {
-        this.canvas = document.getElementById('wheelCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.hiddenOptions = document.getElementById('hiddenOptions');
-        this.resultText = document.getElementById('resultText');
-        this.spinBtn = document.getElementById('spinBtn');
-        this.updateBtn = document.getElementById('updateBtn');
+        class SmartWheelSystem {
+            constructor() {
+                // Основные элементы
+                this.participantWheelCanvas = document.getElementById('participantWheelCanvas');
+                this.participantWheelCtx = this.participantWheelCanvas.getContext('2d');
+                this.participantOptions = document.getElementById('participantOptions');
+                this.participantResultText = document.getElementById('participantResultText');
+                this.updateParticipantsBtn = document.getElementById('updateParticipantsBtn');
+                this.participantWheelContainer = document.getElementById('participantWheelContainer');
+                
+                this.combinedResultText = document.getElementById('combinedResultText');
+                this.historyList = document.getElementById('historyList');
+                
+                // Цвета для сегментов
+                this.colors = [
+                    '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+                    '#EF476F', '#7209B7', '#3A86FF', '#FB5607', '#8338EC'
+                ];
+                
+                // Хранилища для колес
+                this.participantWheel = null;
+                this.topicWheels = {};
+                this.history = [];
+                
+                // Для умного рандома (предотвращение повторений)
+                this.lastResults = {
+                    participants: [],
+                    topic1: [],
+                    topic2: [],
+                    topic3: [],
+                    topic4: []
+                };
+                
+                // Статистика участников
+                this.participantStats = {};
+                
+                this.init();
+            }
+            
+            init() {
+                // Инициализируем колесо участников
+                this.initParticipantWheel();
+                
+                // Инициализируем 4 тематических колеса
+                for (let i = 1; i <= 4; i++) {
+                    this.initTopicWheel(i);
+                }
+                
+                // Запускаем анимацию
+                this.animate();
+            }
+            
+            initParticipantWheel() {
+                this.participantWheel = {
+                    canvas: this.participantWheelCanvas,
+                    ctx: this.participantWheelCtx,
+                    fullOptions: [],
+                    options: [],
+                    isSpinning: false,
+                    currentRotation: 0,
+                    spinDuration: 4000,
+                    stats: {} // Для учета выпадений участников
+                };
+                
+                // Загружаем начальные варианты
+                this.parseParticipantOptions();
+                
+                // События
+                this.updateParticipantsBtn.addEventListener('click', () => {
+                    this.parseParticipantOptions();
+                    this.drawParticipantWheel();
+                });
+                
+                this.participantWheelContainer.addEventListener('click', () => {
+                    this.spinParticipantWheel();
+                });
+                
+                // Рисуем начальное колесо
+                this.drawParticipantWheel();
+            }
+            
+            initTopicWheel(wheelNumber) {
+                const canvas = document.querySelector(`.wheel-canvas[data-wheel="${wheelNumber}"]`);
+                const container = document.querySelector(`.wheel-container[data-wheel="${wheelNumber}"]`);
+                const textarea = document.getElementById(`options${wheelNumber}`);
+                
+                const wheel = {
+                    number: wheelNumber,
+                    canvas: canvas,
+                    ctx: canvas.getContext('2d'),
+                    container: container,
+                    textarea: textarea,
+                    fullOptions: [],
+                    options: [],
+                    isSpinning: false,
+                    currentRotation: 0,
+                    spinDuration: 3000 + Math.random() * 2000,
+                    selectedSegment: null,
+                    title: this.getWheelTitle(wheelNumber)
+                };
+                
+                // Загружаем варианты
+                this.parseTopicWheelOptions(wheel);
+                
+                // События
+                container.addEventListener('click', () => {
+                    this.spinTopicWheel(wheel);
+                });
+                
+                this.topicWheels[wheelNumber] = wheel;
+                this.drawTopicWheel(wheel);
+            }
+            
+            getWheelTitle(number) {
+                const titles = {
+                    1: 'Вопросы для обсуждения',
+                    2: 'Тематика выступления',
+                    3: 'Формат ответа',
+                    4: 'Стиль презентации'
+                };
+                return titles[number] || `Колесо ${number}`;
+            }
+            
+            parseParticipantOptions() {
+                const text = this.participantOptions.value.trim();
+                if (!text) {
+                    this.participantWheel.fullOptions = ['Добавьте участников'];
+                    this.participantWheel.options = ['Добавьте участников'];
+                    return;
+                }
+                
+                // Сохраняем полные тексты
+                const participants = text.split('\n')
+                    .map(opt => opt.trim())
+                    .filter(opt => opt !== '');
+                
+                this.participantWheel.fullOptions = participants;
+                this.participantWheel.options = participants.map(opt => this.truncateText(opt, 15));
+                
+                // Инициализируем статистику для новых участников
+                participants.forEach(participant => {
+                    if (!this.participantStats[participant]) {
+                        this.participantStats[participant] = 0;
+                    }
+                });
+            }
+            
+            parseTopicWheelOptions(wheel) {
+                const text = wheel.textarea.value.trim();
+                if (!text) {
+                    wheel.fullOptions = ['Добавьте варианты'];
+                    wheel.options = ['Добавьте варианты'];
+                    return;
+                }
+                
+                wheel.fullOptions = text.split('\n')
+                    .map(opt => opt.trim())
+                    .filter(opt => opt !== '');
+                    
+                wheel.options = wheel.fullOptions.map(opt => this.truncateText(opt, 10));
+            }
+            
+            truncateText(text, maxLength) {
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength) + '...';
+            }
+            
+            // Умный рандом с учетом истории и статистики
+            getSmartRandomIndex(options, lastResultsArray, stats = null) {
+                const weights = options.map((option, index) => {
+                    let weight = 100; // Базовая вероятность
+                    
+                    // Уменьшаем вес для недавно выпадавших вариантов
+                    const recentIndex = lastResultsArray.lastIndexOf(index);
+                    if (recentIndex !== -1) {
+                        const distanceFromEnd = lastResultsArray.length - recentIndex;
+                        weight = Math.max(10, 100 - (distanceFromEnd * 30));
+                    }
+                    
+                    // Для участников: увеличиваем вес для тех, кто выпадал меньше
+                    if (stats && stats[option] !== undefined) {
+                        const minCount = Math.min(...Object.values(stats));
+                        const count = stats[option];
+                        if (count > minCount) {
+                            weight = Math.max(20, weight - ((count - minCount) * 20));
+                        }
+                    }
+                    
+                    return weight;
+                });
+                
+                // Преобразуем веса в вероятности
+                const totalWeight = weights.reduce((a, b) => a + b, 0);
+                const random = Math.random() * totalWeight;
+                
+                let cumulativeWeight = 0;
+                for (let i = 0; i < weights.length; i++) {
+                    cumulativeWeight += weights[i];
+                    if (random <= cumulativeWeight) {
+                        return i;
+                    }
+                }
+                
+                return Math.floor(Math.random() * options.length); // Fallback
+            }
+            
+            drawParticipantWheel() {
+                const width = this.participantWheelCanvas.width;
+                const height = this.participantWheelCanvas.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const radius = Math.min(width, height) / 2 - 15;
+                
+                this.participantWheelCtx.clearRect(0, 0, width, height);
+                
+                if (this.participantWheel.options.length === 0) {
+                    this.drawEmptyWheel(this.participantWheelCtx, centerX, centerY, radius, "Добавьте участников");
+                    return;
+                }
+                
+                const segmentAngle = (2 * Math.PI) / this.participantWheel.options.length;
+                
+                // Рисуем сегменты
+                for (let i = 0; i < this.participantWheel.options.length; i++) {
+                    const startAngle = i * segmentAngle + this.participantWheel.currentRotation;
+                    const endAngle = (i + 1) * segmentAngle + this.participantWheel.currentRotation;
+                    
+                    // Сегмент
+                    this.participantWheelCtx.beginPath();
+                    this.participantWheelCtx.moveTo(centerX, centerY);
+                    this.participantWheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    this.participantWheelCtx.closePath();
+                    
+                    // Цвет сегмента (более яркие цвета для участников)
+                    const colorIndex = i % this.colors.length;
+                    const baseColor = this.colors[colorIndex];
+                    const gradient = this.participantWheelCtx.createRadialGradient(
+                        centerX, centerY, 0,
+                        centerX, centerY, radius
+                    );
+                    
+                    gradient.addColorStop(0, this.lightenColor(baseColor, 40));
+                    gradient.addColorStop(1, baseColor);
+                    
+                    this.participantWheelCtx.fillStyle = gradient;
+                    this.participantWheelCtx.fill();
+                    
+                    // Граница сегмента
+                    this.participantWheelCtx.strokeStyle = '#fff';
+                    this.participantWheelCtx.lineWidth = 3;
+                    this.participantWheelCtx.stroke();
+                    
+                    // Текст на сегменте
+                    this.drawSegmentText(
+                        this.participantWheelCtx,
+                        this.participantWheel.options[i],
+                        centerX,
+                        centerY,
+                        radius - 35,
+                        startAngle + segmentAngle / 2
+                    );
+                }
+                
+                // Центральный круг
+                this.drawCenter(this.participantWheelCtx, centerX, centerY, 30, '👥');
+            }
+            
+            drawTopicWheel(wheel) {
+                const width = wheel.canvas.width;
+                const height = wheel.canvas.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const radius = Math.min(width, height) / 2 - 10;
+                
+                wheel.ctx.clearRect(0, 0, width, height);
+                
+                if (wheel.options.length === 0) {
+                    this.drawEmptyWheel(wheel.ctx, centerX, centerY, radius, "Нет вариантов");
+                    return;
+                }
+                
+                const segmentAngle = (2 * Math.PI) / wheel.options.length;
+                
+                // Рисуем сегменты
+                for (let i = 0; i < wheel.options.length; i++) {
+                    const startAngle = i * segmentAngle + wheel.currentRotation;
+                    const endAngle = (i + 1) * segmentAngle + wheel.currentRotation;
+                    
+                    // Сегмент
+                    wheel.ctx.beginPath();
+                    wheel.ctx.moveTo(centerX, centerY);
+                    wheel.ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    wheel.ctx.closePath();
+                    
+                    // Цвет сегмента
+                    const color = this.colors[i % this.colors.length];
+                    wheel.ctx.fillStyle = color;
+                    wheel.ctx.fill();
+                    
+                    // Граница сегмента
+                    wheel.ctx.strokeStyle = '#fff';
+                    wheel.ctx.lineWidth = 2;
+                    wheel.ctx.stroke();
+                    
+                    // Текст на сегменте
+                    this.drawSegmentText(
+                        wheel.ctx,
+                        wheel.options[i],
+                        centerX,
+                        centerY,
+                        radius - 20,
+                        startAngle + segmentAngle / 2,
+                        true // Меньший шрифт для тематических колес
+                    );
+                }
+                
+                // Центральный круг
+                this.drawCenter(wheel.ctx, centerX, centerY, 20, wheel.number);
+            }
+            
+            drawEmptyWheel(ctx, centerX, centerY, radius, text) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fill();
+                ctx.strokeStyle = '#ddd';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                ctx.fillStyle = '#999';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, centerX, centerY);
+            }
+            
+            drawSegmentText(ctx, text, x, y, radius, angle, small = false) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fff';
+                
+                // Выбираем размер шрифта в зависимости от длины текста
+                let fontSize = small ? 12 : 14;
+                if (text.length > 8) fontSize = small ? 10 : 12;
+                if (text.length > 12) fontSize = small ? 8 : 10;
+                
+                ctx.font = `bold ${fontSize}px Arial`;
+                
+                // Тень для лучшей читаемости
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 2;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                
+                ctx.fillText(text, radius - 8, 5);
+                ctx.restore();
+            }
+            
+            drawCenter(ctx, centerX, centerY, radius, text) {
+                // Внешний круг
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+                
+                // Текст в центре
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${radius > 25 ? '20px' : '16px'} Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, centerX, centerY);
+            }
+            
+            lightenColor(color, percent) {
+                const num = parseInt(color.replace("#", ""), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = Math.min(255, (num >> 16) + amt);
+                const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+                const B = Math.min(255, (num & 0x0000FF) + amt);
+                
+                return "#" + (
+                    0x1000000 +
+                    (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+                    (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+                    (B < 255 ? (B < 1 ? 0 : B) : 255)
+                ).toString(16).slice(1);
+            }
+            
+            spinParticipantWheel() {
+                if (this.participantWheel.isSpinning || this.participantWheel.options.length === 0) return;
+                
+                this.participantWheel.isSpinning = true;
+                
+                // Умный выбор индекса с учетом статистики
+                const selectedIndex = this.getSmartRandomIndex(
+                    this.participantWheel.fullOptions,
+                    this.lastResults.participants,
+                    this.participantStats
+                );
+                
+                // Вычисляем целевой угол для выбранного участника
+                const segmentAngle = (2 * Math.PI) / this.participantWheel.fullOptions.length;
+                const targetCenter = selectedIndex * segmentAngle + segmentAngle / 2;
+                
+                // Случайное количество оборотов (4-7) с ускорением
+                const extraSpins = 4 + Math.random() * 3;
+                const acceleration = 0.5 + Math.random() * 0.5; // Случайное ускорение 0.5-1.0
+                
+                // Угол стрелки (смотрит вверх, это -π/2)
+                const arrowAngle = -Math.PI / 2;
+                
+                // Целевой угол вращения
+                this.participantWheel.targetRotation = arrowAngle - targetCenter + Math.PI * 2 * extraSpins * acceleration;
+                this.participantWheel.startRotation = this.participantWheel.currentRotation;
+                this.participantWheel.startTime = Date.now();
+                
+                // Анимация
+                this.animateParticipantSpin();
+            }
+            
+            animateParticipantSpin() {
+                if (!this.participantWheel.isSpinning) return;
+                
+                const now = Date.now();
+                const elapsed = now - this.participantWheel.startTime;
+                const progress = Math.min(elapsed / this.participantWheel.spinDuration, 1);
+                
+                // Сложная easing функция для реалистичного вращения
+                const easeOutBack = (t) => {
+                    const c1 = 1.70158;
+                    const c3 = c1 + 1;
+                    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+                };
+                
+                const easedProgress = easeOutBack(progress);
+                
+                // Вычисляем текущее вращение
+                this.participantWheel.currentRotation = this.participantWheel.startRotation + 
+                    (this.participantWheel.targetRotation - this.participantWheel.startRotation) * easedProgress;
+                
+                this.drawParticipantWheel();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(() => this.animateParticipantSpin());
+                } else {
+                    this.finishParticipantSpin();
+                }
+            }
+            
+            finishParticipantSpin() {
+                this.participantWheel.isSpinning = false;
+                
+                // Определяем выбранного участника
+                const arrowAngle = -Math.PI / 2;
+                const segmentAngle = (2 * Math.PI) / this.participantWheel.fullOptions.length;
+                const angleFromStart = (arrowAngle - this.participantWheel.currentRotation + Math.PI * 2) % (Math.PI * 2);
+                
+                let selectedIndex = Math.floor(angleFromStart / segmentAngle);
+                selectedIndex = selectedIndex % this.participantWheel.fullOptions.length;
+                if (selectedIndex < 0) selectedIndex += this.participantWheel.fullOptions.length;
+                
+                const selectedParticipant = this.participantWheel.fullOptions[selectedIndex];
+                
+                // Обновляем статистику
+                if (this.participantStats[selectedParticipant] !== undefined) {
+                    this.participantStats[selectedParticipant]++;
+                }
+                
+                // Сохраняем в историю последних результатов
+                this.lastResults.participants.unshift(selectedIndex);
+                if (this.lastResults.participants.length > 5) {
+                    this.lastResults.participants.pop();
+                }
+                
+                // Показываем результат
+                this.participantResultText.textContent = `🎯 ${selectedParticipant}`;
+                this.participantResultText.classList.add('result-pulse');
+                
+                // Добавляем в историю
+                this.addToHistory('👤 Участник', selectedParticipant);
+                
+                setTimeout(() => {
+                    this.participantResultText.classList.remove('result-pulse');
+                }, 500);
+            }
+            
+            spinTopicWheel(wheel) {
+                if (wheel.isSpinning || wheel.options.length === 0) return;
+                
+                wheel.isSpinning = true;
+                
+                // Умный выбор индекса с учетом истории
+                const selectedIndex = this.getSmartRandomIndex(
+                    wheel.fullOptions,
+                    this.lastResults[`topic${wheel.number}`]
+                );
+                
+                // Вычисляем целевой угол
+                const segmentAngle = (2 * Math.PI) / wheel.fullOptions.length;
+                const targetCenter = selectedIndex * segmentAngle + segmentAngle / 2;
+                
+                // Случайное количество оборотов (3-5) с ускорением
+                const extraSpins = 3 + Math.random() * 2;
+                const acceleration = 0.6 + Math.random() * 0.4; // Случайное ускорение 0.6-1.0
+                
+                const arrowAngle = -Math.PI / 2;
+                wheel.targetRotation = arrowAngle - targetCenter + Math.PI * 2 * extraSpins * acceleration;
+                wheel.startRotation = wheel.currentRotation;
+                wheel.startTime = Date.now();
+                
+                // Анимация
+                this.animateTopicSpin(wheel);
+            }
+            
+            animateTopicSpin(wheel) {
+                if (!wheel.isSpinning) return;
+                
+                const now = Date.now();
+                const elapsed = now - wheel.startTime;
+                const progress = Math.min(elapsed / wheel.spinDuration, 1);
+                
+                // Сложная easing функция
+                const easeOutElastic = (t) => {
+                    const c4 = (2 * Math.PI) / 3;
+                    return t === 0 ? 0 :
+                           t === 1 ? 1 :
+                           Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+                };
+                
+                const easedProgress = easeOutElastic(progress);
+                
+                wheel.currentRotation = wheel.startRotation + 
+                    (wheel.targetRotation - wheel.startRotation) * easedProgress;
+                
+                this.drawTopicWheel(wheel);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(() => this.animateTopicSpin(wheel));
+                } else {
+                    this.finishTopicSpin(wheel);
+                }
+            }
+            
+            finishTopicSpin(wheel) {
+                wheel.isSpinning = false;
+                
+                const arrowAngle = -Math.PI / 2;
+                const segmentAngle = (2 * Math.PI) / wheel.fullOptions.length;
+                const angleFromStart = (arrowAngle - wheel.currentRotation + Math.PI * 2) % (Math.PI * 2);
+                
+                let selectedIndex = Math.floor(angleFromStart / segmentAngle);
+                selectedIndex = selectedIndex % wheel.fullOptions.length;
+                if (selectedIndex < 0) selectedIndex += wheel.fullOptions.length;
+                
+                wheel.selectedSegment = wheel.fullOptions[selectedIndex];
+                
+                // Сохраняем в историю
+                this.lastResults[`topic${wheel.number}`].unshift(selectedIndex);
+                if (this.lastResults[`topic${wheel.number}`].length > 3) {
+                    this.lastResults[`topic${wheel.number}`].pop();
+                }
+                
+                // Показываем результат
+                this.combinedResultText.textContent = `🎲 ${wheel.title}:\n${wheel.selectedSegment}`;
+                this.combinedResultText.classList.add('result-pulse');
+                
+                // Добавляем в историю
+                this.addToHistory(wheel.title, wheel.selectedSegment);
+                
+                setTimeout(() => {
+                    this.combinedResultText.classList.remove('result-pulse');
+                }, 500);
+            }
+            
+            addToHistory(source, result) {
+                const time = new Date().toLocaleTimeString('ru-RU', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                const historyItem = {
+                    time: time,
+                    source: source,
+                    result: result
+                };
+                
+                this.history.unshift(historyItem);
+                
+                // Ограничиваем историю 15 записями
+                if (this.history.length > 15) {
+                    this.history.pop();
+                }
+                
+                this.updateHistoryDisplay();
+            }
+            
+            updateHistoryDisplay() {
+                this.historyList.innerHTML = '';
+                
+                this.history.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>
+                            <strong>${item.source}:</strong> ${item.result}
+                        </span>
+                        <span class="history-time">${item.time}</span>
+                    `;
+                    this.historyList.appendChild(li);
+                });
+            }
+            
+            animate() {
+                // Легкая анимация покоя
+                if (this.participantWheel && !this.participantWheel.isSpinning) {
+                    this.participantWheel.currentRotation += 0.0005;
+                    this.drawParticipantWheel();
+                }
+                
+                Object.values(this.topicWheels).forEach(wheel => {
+                    if (!wheel.isSpinning) {
+                        wheel.currentRotation += 0.0005;
+                        this.drawTopicWheel(wheel);
+                    }
+                });
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
         
-        // Цвета для сегментов
-        this.colors = [
-            '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
-            '#EF476F', '#7209B7', '#3A86FF', '#FB5607', '#8338EC',
-            '#FF006E', '#FFBE0B', '#3A86FF', '#FB5607', '#8338EC'
-        ];
-        
-        // Настройки вращения
-        this.isSpinning = false;
-        this.currentRotation = 0;
-        this.targetRotation = 0;
-        this.spinDuration = 4000;
-        this.selectedSegment = null;
-        
-        // Храним полные тексты вариантов
-        this.fullOptions = [];
-        
-        // Инициализация
-        this.init();
-    }
-    
-    init() {
-        // Загружаем варианты из скрытого поля
-        this.parseOptions();
-        
-        // Рисуем начальное колесо
-        this.drawWheel();
-        
-        // События
-        this.spinBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.spinWheel();
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const wheelSystem = new SmartWheelSystem();
+            window.wheelSystem = wheelSystem;
         });
-        
-        this.canvas.addEventListener('click', () => this.spinWheel());
-        
-        // Если нужно обновлять варианты динамически
-        this.updateBtn.addEventListener('click', () => {
-            this.parseOptions();
-            this.drawWheel();
-        });
-        
-        // Запускаем анимационный цикл
-        this.animate();
-    }
-    
-    parseOptions() {
-        const text = this.hiddenOptions.value.trim();
-        if (!text) {
-            this.fullOptions = ['Добавьте варианты'];
-            this.options = ['Добавьте варианты'];
-            return;
-        }
-        
-        // Сохраняем полные тексты
-        this.fullOptions = text.split('\n')
-            .map(opt => opt.trim())
-            .filter(opt => opt !== '');
-            
-        // Для отображения на колесе - обрезаем
-        this.options = this.fullOptions.map(opt => this.truncateText(opt, 20));
-    }
-    
-    truncateText(text, maxLength) {
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '...';
-    }
-    
-    drawWheel() {
-        const width = this.canvas.width;
-        const height = this.canvas.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const radius = Math.min(width, height) / 2 - 10;
-        
-        this.ctx.clearRect(0, 0, width, height);
-        
-        if (this.options.length === 0) {
-            this.drawEmptyWheel(centerX, centerY, radius);
-            return;
-        }
-        
-        const segmentAngle = (2 * Math.PI) / this.options.length;
-        
-        // Рисуем сегменты
-        for (let i = 0; i < this.options.length; i++) {
-            const startAngle = i * segmentAngle + this.currentRotation;
-            const endAngle = (i + 1) * segmentAngle + this.currentRotation;
-            
-            // Сегмент
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX, centerY);
-            this.ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-            this.ctx.closePath();
-            
-            // Цвет сегмента
-            const color = this.colors[i % this.colors.length];
-            this.ctx.fillStyle = color;
-            this.ctx.fill();
-            
-            // Граница сегмента
-            this.ctx.strokeStyle = '#fff';
-            this.ctx.lineWidth = 2;
-            this.ctx.stroke();
-            
-            // Текст на сегменте
-            this.drawSegmentText(
-                this.options[i],
-                centerX,
-                centerY,
-                radius - 30,
-                startAngle + segmentAngle / 2
-            );
-        }
-        
-        // Центральный круг
-        this.drawCenter(centerX, centerY);
-    }
-    
-    drawEmptyWheel(centerX, centerY, radius) {
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#f0f0f0';
-        this.ctx.fill();
-        this.ctx.strokeStyle = '#ddd';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
-        
-        this.ctx.fillStyle = '#999';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Нет вариантов', centerX, centerY);
-    }
-    
-    drawSegmentText(text, x, y, radius, angle) {
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(angle);
-        this.ctx.textAlign = 'right';
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = this.getFontForText(text);
-        
-        // Тень для лучшей читаемости
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.shadowOffsetX = 1;
-        this.ctx.shadowOffsetY = 1;
-        
-        this.ctx.fillText(text, radius - 15, 5);
-        this.ctx.restore();
-    }
-    
-    getFontForText(text) {
-        if (text.length > 15) return 'bold 12px Arial';
-        if (text.length > 10) return 'bold 14px Arial';
-        return 'bold 16px Arial';
-    }
-    
-    drawCenter(centerX, centerY) {
-        // Внешний круг
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 25, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#333';
-        this.ctx.fill();
-        
-        // Внутренний круг
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#fff';
-        this.ctx.fill();
-        
-        // Декоративные линии
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-            const angle = (i * Math.PI) / 4;
-            const x1 = centerX + Math.cos(angle) * 10;
-            const y1 = centerY + Math.sin(angle) * 10;
-            const x2 = centerX + Math.cos(angle) * 20;
-            const y2 = centerY + Math.sin(angle) * 20;
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-        }
-        this.ctx.stroke();
-    }
-    
-    spinWheel() {
-        if (this.isSpinning || this.options.length === 0) return;
-        
-        this.isSpinning = true;
-        this.spinBtn.classList.add('spinning');
-        this.resultText.textContent = "Крутим...";
-        
-        // Случайное количество оборотов (3-6)
-        const extraSpins = 3 + Math.random() * 3;
-        const randomOffset = Math.random() * Math.PI * 2;
-        this.startRotation = this.currentRotation;
-        this.targetRotation = this.currentRotation + Math.PI * 2 * extraSpins + randomOffset;
-        this.startTime = Date.now();
-        
-        // Запускаем анимацию вращения
-        this.animateSpin();
-    }
-    
-    animateSpin() {
-        if (!this.isSpinning) return;
-        
-        const now = Date.now();
-        const elapsed = now - this.startTime;
-        const progress = Math.min(elapsed / this.spinDuration, 1);
-        
-        // Easing функция для плавного замедления
-        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-        const easedProgress = easeOutCubic(progress);
-        
-        // Вычисляем текущее вращение
-        this.currentRotation = this.startRotation + 
-            (this.targetRotation - this.startRotation) * easedProgress;
-        
-        this.drawWheel();
-        
-        if (progress < 1) {
-            requestAnimationFrame(() => this.animateSpin());
-        } else {
-            this.finishSpin();
-        }
-    }
-    
-    finishSpin() {
-        this.isSpinning = false;
-        this.spinBtn.classList.remove('spinning');
-        
-        // Нормализуем вращение
-        this.currentRotation = this.currentRotation % (Math.PI * 2);
-        
-        // Угол стрелки (смотрит вверх, это -π/2 или 270 градусов)
-        const arrowAngle = -Math.PI / 2;
-        
-        // Вычисляем, какой сегмент находится под стрелкой
-        const segmentAngle = (2 * Math.PI) / this.options.length;
-        
-        // Вычисляем угол относительно центра колеса с учетом вращения
-        // Нужно учесть, что сегменты рисуются с offset, а не с нуля
-        const angleFromStart = (arrowAngle - this.currentRotation + Math.PI * 2) % (Math.PI * 2);
-        
-        // Вычисляем индекс сегмента (делим на угол сегмента и берем целую часть)
-        let selectedIndex = Math.floor(angleFromStart / segmentAngle);
-        
-        // Обеспечиваем, что индекс в пределах массива
-        selectedIndex = selectedIndex % this.options.length;
-        if (selectedIndex < 0) selectedIndex += this.options.length;
-        
-        // Берем полный текст из оригинального массива
-        if (this.fullOptions[selectedIndex]) {
-            this.selectedSegment = this.fullOptions[selectedIndex];
-        } else {
-            // Fallback на случай ошибки
-            this.selectedSegment = this.fullOptions[0] || "Ошибка выбора";
-        }
-        
-        // Вращаем колесо так, чтобы выбранный сегмент оказался точно под стрелкой
-        // Центр выбранного сегмента должен быть напротив стрелки
-        const selectedSegmentCenter = selectedIndex * segmentAngle + segmentAngle / 2;
-        const adjustment = arrowAngle - selectedSegmentCenter;
-        this.currentRotation = adjustment;
-        
-        // Перерисовываем колесо с правильной позицией
-        this.drawWheel();
-        
-        // Показываем результат с анимацией (полный текст без троеточий)
-        this.resultText.textContent = `🎯 ${this.selectedSegment}`;
-        this.resultText.classList.add('result-pulse');
-        
-        // Убираем класс анимации после её завершения
-        setTimeout(() => {
-            this.resultText.classList.remove('result-pulse');
-        }, 500);
-        
-        // Отправляем результат в родительское окно
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'WHEEL_RESULT',
-                result: this.selectedSegment
-            }, '*');
-        }
-    }
-    
-    animate() {
-        // Легкая анимация покоя (медленное вращение при простое)
-        if (!this.isSpinning) {
-            this.currentRotation += 0.001;
-            this.drawWheel();
-        }
-        requestAnimationFrame(() => this.animate());
-    }
-}
-
-// Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', () => {
-    const wheel = new SimpleWheel();
-    
-    // Экспортируем для возможного использования извне
-    window.wheel = wheel;
-    
-    // Функция для обновления вариантов извне
-    window.updateWheelOptions = function(options) {
-        if (Array.isArray(options)) {
-            document.getElementById('hiddenOptions').value = options.join('\n');
-            wheel.parseOptions();
-            wheel.drawWheel();
-        }
-    };
-    
-    // Функция для запуска вращения извне
-    window.spinWheel = function() {
-        wheel.spinWheel();
-    };
-});
     </script>
 </body>
 </html>
