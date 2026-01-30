@@ -1,10 +1,697 @@
 <!DOCTYPE html>
+<html lang="ru">
 <head>
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Колесо рандомизации</title>
+    <style>
+      * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+h1 i {
+    color: #667eea;
+}
+
+.result-container {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#resultText {
+    font-size: 1.5rem;
+    font-weight: 600;
+    min-height: 36px;
+    transition: all 0.3s ease;
+}
+
+.arrow {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 30px;
+    color: #667eea;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.wheel-container {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    margin: 0 auto 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.wheel-container:hover {
+    transform: scale(1.02);
+}
+
+#wheelCanvas {
+    display: block;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.controls {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+.input-section {
+    margin-bottom: 25px;
+}
+
+.input-section label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #444;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#optionsInput {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+#optionsInput:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.char-counter {
+    text-align: right;
+    margin-top: 8px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#optionCount {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.update-btn {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+}
+
+.spin-btn {
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    color: white;
+}
+
+.example-btn {
+    background: linear-gradient(135deg, #2196F3, #0D47A1);
+    color: white;
+}
+
+.settings {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.setting-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.setting-group span {
+    display: inline-block;
+    margin-left: 10px;
+    font-weight: 600;
+    color: #667eea;
+    min-width: 30px;
+}
+
+.instructions {
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid #2196F3;
+}
+
+.instructions h3 {
+    color: #1565C0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.instructions ul {
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    color: #444;
+    line-height: 1.5;
+}
+
+.spinning {
+    animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 1; }
+    to { opacity: 0.7; }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .wheel-container {
+        width: 300px;
+        height: 300px;
+    }
+    
+    #wheelCanvas {
+        width: 300px;
+        height: 300px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .btn {
+        min-width: 100%;
+    }
+    
+    .buttons {
+        flex-direction: column;
+    }
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <h1>
-    Hello, world
-  </h1>
+    <div class="container">
+        <h1><i class="fas fa-dice"></i> Колесо рандомизации</h1>
+        
+        <div class="result-container">
+            <div id="resultText">Результат появится здесь</div>
+            <div class="arrow">▼</div>
+        </div>
+        
+        <div class="wheel-container">
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        </div>
+        
+        <div class="controls">
+            <div class="input-section">
+                <label for="optionsInput"><i class="fas fa-list"></i> Введите варианты (каждый с новой строки):</label>
+                <textarea id="optionsInput" rows="8" placeholder="Введите варианты здесь...
+Каждый вариант с новой строки...
+Например:
+Вариант 1
+Вариант 2
+Вариант 3
+... и так далее"></textarea>
+                <div class="char-counter">Количество вариантов: <span id="optionCount">0</span></div>
+            </div>
+            
+            <div class="buttons">
+                <button id="updateWheelBtn" class="btn update-btn">
+                    <i class="fas fa-sync-alt"></i> Обновить колесо
+                </button>
+                <button id="spinBtn" class="btn spin-btn">
+                    <i class="fas fa-play"></i> Крутить колесо!
+                </button>
+                <button id="randomExampleBtn" class="btn example-btn">
+                    <i class="fas fa-random"></i> Пример вариантов
+                </button>
+            </div>
+            
+            <div class="settings">
+                <div class="setting-group">
+                    <label for="rotationTime">
+                        <i class="fas fa-clock"></i> Время вращения (сек):
+                    </label>
+                    <input type="range" id="rotationTime" min="3" max="10" value="5" step="0.5">
+                    <span id="timeValue">5.0</span>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="rotationSpeed">
+                        <i class="fas fa-tachometer-alt"></i> Скорость:
+                    </label>
+                    <input type="range" id="rotationSpeed" min="1" max="10" value="5">
+                    <span id="speedValue">5</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Как использовать:</h3>
+            <ul>
+                <li>Введите варианты в текстовое поле (каждый с новой строки)</li>
+                <li>Нажмите "Обновить колесо" для создания колеса с вашими вариантами</li>
+                <li>Нажмите "Крутить колесо!" или кликните на само колесо для запуска</li>
+                <li>Используйте ползунки для настройки времени и скорости вращения</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+      class WheelOfFortune {
+    constructor() {
+        this.canvas = document.getElementById('wheelCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.optionsInput = document.getElementById('optionsInput');
+        this.resultText = document.getElementById('resultText');
+        this.spinBtn = document.getElementById('spinBtn');
+        this.updateBtn = document.getElementById('updateWheelBtn');
+        this.exampleBtn = document.getElementById('randomExampleBtn');
+        this.optionCount = document.getElementById('optionCount');
+        this.rotationTimeInput = document.getElementById('rotationTime');
+        this.speedInput = document.getElementById('rotationSpeed');
+        this.timeValue = document.getElementById('timeValue');
+        this.speedValue = document.getElementById('speedValue');
+        
+        this.options = [];
+        this.colors = [
+            '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+            '#EF476F', '#7209B7', '#3A86FF', '#FB5607', '#8338EC',
+            '#FF006E', '#FFBE0B', '#3A86FF', '#FB5607', '#8338EC'
+        ];
+        
+        this.isSpinning = false;
+        this.currentRotation = 0;
+        this.spinStartTime = 0;
+        this.spinDuration = 5000;
+        this.selectedSegment = null;
+        
+        this.init();
+    }
+    
+    init() {
+        // Загрузка примера вариантов
+        this.loadExample();
+        
+        // Создаем колесо с начальными вариантами
+        this.updateWheel();
+        
+        // События
+        this.optionsInput.addEventListener('input', () => this.updateOptionCount());
+        this.spinBtn.addEventListener('click', () => this.spinWheel());
+        this.updateBtn.addEventListener('click', () => this.updateWheel());
+        this.exampleBtn.addEventListener('click', () => this.loadExample());
+        this.canvas.addEventListener('click', () => this.spinWheel());
+        
+        // Настройки вращения
+        this.rotationTimeInput.addEventListener('input', (e) => {
+            this.spinDuration = e.target.value * 1000;
+            this.timeValue.textContent = e.target.value;
+        });
+        
+        this.speedInput.addEventListener('input', (e) => {
+            this.speedValue.textContent = e.target.value;
+        });
+        
+        // Анимация
+        this.animate();
+        
+        // Обновляем счетчик
+        this.updateOptionCount();
+    }
+    
+    updateOptionCount() {
+        const text = this.optionsInput.value.trim();
+        const options = text ? text.split('\n').filter(opt => opt.trim() !== '') : [];
+        this.optionCount.textContent = options.length;
+    }
+    
+    loadExample() {
+        const examples = [
+            "Красный", "Оранжевый", "Желтый", "Зеленый", "Голубой",
+            "Синий", "Фиолетовый", "Розовый", "Коричневый", "Черный",
+            "Белый", "Серый", "Бирюзовый", "Салатовый", "Бордовый"
+        ];
+        this.optionsInput.value = examples.join('\n');
+        this.updateOptionCount();
+        this.updateWheel();
+    }
+    
+    parseOptions() {
+        const text = this.optionsInput.value.trim();
+        if (!text) return [];
+        
+        return text.split('\n')
+            .map(opt => opt.trim())
+            .filter(opt => opt !== '')
+            .map(opt => this.truncateText(opt, 15)); // Ограничиваем длину текста
+    }
+    
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+    
+    updateWheel() {
+        this.options = this.parseOptions();
+        
+        if (this.options.length === 0) {
+            this.resultText.textContent = "Добавьте варианты в текстовое поле";
+            this.drawEmptyWheel();
+            return;
+        }
+        
+        this.drawWheel();
+        this.resultText.textContent = "Колесо обновлено! Готово к запуску";
+        this.resultText.style.color = "white";
+    }
+    
+    drawEmptyWheel() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Рисуем круг
+        this.ctx.beginPath();
+        this.ctx.arc(250, 250, 240, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#f0f0f0';
+        this.ctx.fill();
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeStyle = '#ddd';
+        this.ctx.stroke();
+        
+        // Текст "Добавьте варианты"
+        this.ctx.fillStyle = '#999';
+        this.ctx.font = 'bold 24px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Добавьте варианты', 250, 250);
+    }
+    
+    drawWheel() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = 240;
+        const segmentAngle = (2 * Math.PI) / this.options.length;
+        
+        // Рисуем сегменты
+        for (let i = 0; i < this.options.length; i++) {
+            const startAngle = i * segmentAngle + this.currentRotation;
+            const endAngle = (i + 1) * segmentAngle + this.currentRotation;
+            
+            // Сегмент
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX, centerY);
+            this.ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            this.ctx.closePath();
+            
+            // Градиент для цвета
+            const gradient = this.ctx.createLinearGradient(
+                centerX + Math.cos(startAngle) * radius,
+                centerY + Math.sin(startAngle) * radius,
+                centerX + Math.cos(endAngle) * radius,
+                centerY + Math.sin(endAngle) * radius
+            );
+            
+            const baseColor = this.colors[i % this.colors.length];
+            gradient.addColorStop(0, this.lightenColor(baseColor, 20));
+            gradient.addColorStop(1, baseColor);
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.fill();
+            
+            // Границы сегментов
+            this.ctx.strokeStyle = '#fff';
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+            
+            // Текст на сегментах
+            this.drawSegmentText(
+                this.options[i],
+                centerX,
+                centerY,
+                radius - 40,
+                startAngle + segmentAngle / 2
+            );
+        }
+        
+        // Центральный круг
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#333';
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 4;
+        this.ctx.stroke();
+        
+        // Украшение центра
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fill();
+    }
+    
+    drawSegmentText(text, x, y, radius, angle) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(angle);
+        this.ctx.textAlign = 'right';
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 16px Arial';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 3;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+        
+        // Если текст длинный - переносим
+        if (text.length > 10) {
+            this.ctx.font = 'bold 14px Arial';
+        }
+        
+        this.ctx.fillText(text, radius - 10, 5);
+        this.ctx.restore();
+    }
+    
+    lightenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        
+        return "#" + (
+            0x1000000 +
+            (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+            (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+            (B < 255 ? (B < 1 ? 0 : B) : 255)
+        ).toString(16).slice(1);
+    }
+    
+    spinWheel() {
+        if (this.isSpinning || this.options.length === 0) return;
+        
+        this.isSpinning = true;
+        this.spinStartTime = Date.now();
+        this.selectedSegment = null;
+        
+        // Эффект кнопки
+        this.spinBtn.classList.add('spinning');
+        this.resultText.textContent = "Колесо крутится...";
+        this.resultText.style.color = "#FFD166";
+        
+        // Добавляем случайное вращение
+        const extraSpins = 5 + Math.random() * 3; // 5-8 полных оборотов
+        const randomOffset = Math.random() * Math.PI * 2;
+        this.targetRotation = this.currentRotation + Math.PI * 2 * extraSpins + randomOffset;
+        
+        // Запускаем анимацию
+        requestAnimationFrame(() => this.updateSpin());
+    }
+    
+    updateSpin() {
+        if (!this.isSpinning) return;
+        
+        const now = Date.now();
+        const elapsed = now - this.spinStartTime;
+        const progress = Math.min(elapsed / this.spinDuration, 1);
+        
+        // Easing функция для плавного замедления
+        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+        const easedProgress = easeOut(progress);
+        
+        // Скорость вращения (замедление к концу)
+        const speedMultiplier = parseInt(this.speedInput.value) / 5;
+        const currentRotation = this.currentRotation + 
+            (this.targetRotation - this.currentRotation) * easedProgress * speedMultiplier;
+        
+        this.currentRotation = currentRotation % (Math.PI * 2);
+        this.drawWheel();
+        
+        if (progress < 1) {
+            requestAnimationFrame(() => this.updateSpin());
+        } else {
+            this.finishSpin();
+        }
+    }
+    
+    finishSpin() {
+        this.isSpinning = false;
+        this.spinBtn.classList.remove('spinning');
+        
+        // Определяем выбранный сегмент
+        const normalizedRotation = (this.currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+        const segmentAngle = (2 * Math.PI) / this.options.length;
+        const selectedIndex = Math.floor(
+            (Math.PI * 2 - normalizedRotation) / segmentAngle
+        ) % this.options.length;
+        
+        this.selectedSegment = this.options[selectedIndex];
+        
+        // Показываем результат
+        this.resultText.textContent = `🎉 Выпало: ${this.selectedSegment}`;
+        this.resultText.style.color = "#4ECDC4";
+        
+        // Анимация результата
+        this.animateResult();
+        
+        // Обновляем URL с результатом (для истории)
+        history.replaceState(null, '', `#${encodeURIComponent(this.selectedSegment)}`);
+    }
+    
+    animateResult() {
+        const resultElement = this.resultText;
+        resultElement.style.transform = 'scale(1.1)';
+        resultElement.style.transition = 'transform 0.3s ease';
+        
+        setTimeout(() => {
+            resultElement.style.transform = 'scale(1)';
+        }, 300);
+    }
+    
+    animate() {
+        // Постоянная анимация для плавного отображения
+        if (!this.isSpinning) {
+            this.drawWheel();
+        }
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    new WheelOfFortune();
+});
+    </script>
 </body>
 </html>
