@@ -303,7 +303,7 @@ input[type="range"]::-webkit-slider-thumb {
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-dice"></i> Колесо рандомизации</h1>
+        
         
         <div class="result-container">
             <div id="resultText">Результат появится здесь</div>
@@ -316,18 +316,18 @@ input[type="range"]::-webkit-slider-thumb {
         
         <div class="controls">
             <div class="input-section">
-                <label for="optionsInput"><i class="fas fa-list"></i> Введите варианты (каждый с новой строки):</label>
-                <textarea id="optionsInput" rows="8" placeholder="Введите варианты здесь...
+                <label style="display: none;" for="optionsInput"><i class="fas fa-list"></i> Введите варианты (каждый с новой строки):</label>
+                <textarea style="display: none;" id="optionsInput" rows="8" placeholder="Введите варианты здесь...
 Каждый вариант с новой строки...
 Например:
 Вариант 1
 Вариант 2
 Вариант 3
 ... и так далее"></textarea>
-                <div class="char-counter">Количество вариантов: <span id="optionCount">0</span></div>
+                <div style="display: none;" class="char-counter">Количество вариантов: <span id="optionCount">0</span></div>
             </div>
             
-            <div class="buttons">
+            <div style="display: none;" class="buttons">
                 <button id="updateWheelBtn" class="btn update-btn">
                     <i class="fas fa-sync-alt"></i> Обновить колесо
                 </button>
@@ -339,7 +339,7 @@ input[type="range"]::-webkit-slider-thumb {
                 </button>
             </div>
             
-            <div class="settings">
+            <div style="display: none;" class="settings">
                 <div class="setting-group">
                     <label for="rotationTime">
                         <i class="fas fa-clock"></i> Время вращения (сек):
@@ -358,7 +358,7 @@ input[type="range"]::-webkit-slider-thumb {
             </div>
         </div>
         
-        <div class="instructions">
+        <div style="display: none;" class="instructions">
             <h3><i class="fas fa-info-circle"></i> Как использовать:</h3>
             <ul>
                 <li>Введите варианты в текстовое поле (каждый с новой строки)</li>
